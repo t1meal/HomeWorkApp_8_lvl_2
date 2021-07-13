@@ -1,27 +1,41 @@
+package Server;
+
+import Client.Talker;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Scanner;
 
-public class Server {
+public class ServMain {
     public static void main(String[] args) {
-        ServerSocket serv = null;
         Socket socket = null;
+        ServerSocket serv = null;
+//        Talker mess1 = new Talker();
 
-        try {
-            serv = new ServerSocket(8888);
+
+        try  {
+            serv = new ServerSocket(8900);
             System.out.println("Server is running!");
 
             socket = serv.accept();
             System.out.println("Client has connect!");
 
-            Scanner in = new Scanner(socket.getInputStream());
+//            Scanner in = new Scanner(socket.getInputStream());
+            DataInputStream in = new DataInputStream (socket.getInputStream());
+            DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+//            PrintWriter out = new PrintWriter(socket.getOutputStream(),true);
 
             while (true){
-                String str = in.nextLine();
-                System.out.println(str);
+                String str = in.readUTF();
+                if(str.equals("/end")){
+                    break;
+                }
+                System.out.println("Client:" + str);
+                out.writeUTF("Echo " + str);
             }
 
         } catch (IOException e) {

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+
+<VBox fx:id="vbox" alignment="center" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/11.0.1" fx:controller="Client.Controller">
+
+    <TextArea fx:id="textArea" editable="false" wrapText="true" VBox.vgrow="ALWAYS" />
+    <HBox fx:id="hbox">
+        <TextField fx:id="textField" onAction="#sendMsg" promptText="Введите ваше сообщение...." HBox.hgrow="ALWAYS" />
+        <Button fx:id="sendButton" onAction="#sendMsg" text="Send" />
+    </HBox>
+</VBox>
