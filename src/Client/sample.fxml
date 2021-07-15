@@ -9,7 +9,7 @@
 
     <TextArea fx:id="textArea" editable="false" wrapText="true" VBox.vgrow="ALWAYS" />
     <HBox fx:id="hbox">
-        <TextField fx:id="textField" onAction="#sendMsg" promptText="Введите ваше сообщение...." HBox.hgrow="ALWAYS" />
-        <Button fx:id="sendButton" onAction="#sendMsg" text="Send" />
+        <TextField fx:id="textField" onAction="#sendMsgApp" promptText="Введите ваше сообщение...." HBox.hgrow="ALWAYS" />
+        <Button fx:id="sendButton" onAction="#sendMsgApp" text="Send" />
     </HBox>
 </VBox>

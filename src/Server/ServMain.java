@@ -1,42 +1,29 @@
 package Server;
 
-import Client.Talker;
-
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Scanner;
+import java.util.Vector;
 
 public class ServMain {
-    public static void main(String[] args) {
+    private Vector <ClientHandler> clients;
+
+    public ServMain() {
         Socket socket = null;
         ServerSocket serv = null;
-//        Talker mess1 = new Talker();
-
+        clients = new Vector<>();
 
         try  {
-            serv = new ServerSocket(8900);
+            serv = new ServerSocket(8990);
             System.out.println("Server is running!");
 
-            socket = serv.accept();
-            System.out.println("Client has connect!");
-
-//            Scanner in = new Scanner(socket.getInputStream());
-            DataInputStream in = new DataInputStream (socket.getInputStream());
-            DataOutputStream out = new DataOutputStream(socket.getOutputStream());
-//            PrintWriter out = new PrintWriter(socket.getOutputStream(),true);
-
             while (true){
-                String str = in.readUTF();
-                if(str.equals("/end")){
-                    break;
-                }
-                System.out.println("Client:" + str);
-                out.writeUTF("Echo " + str);
+                socket = serv.accept();
+                System.out.println("Client has connect!");
+
+                clients.add(new ClientHandler(this, socket));
             }
+
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -51,6 +38,12 @@ public class ServMain {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+
+        }
+    }
+    public void broadcastMsg(String msg){
+        for (ClientHandler o : clients) {
+            o.sendMsg(msg);
         }
     }
 

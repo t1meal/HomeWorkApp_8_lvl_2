@@ -25,10 +25,10 @@ public class Controller implements Initializable {
     DataInputStream in;
     DataOutputStream out;
 
-    final String IP_ADRESS = "localhost";
-    final int PORT = 8900;
+    final String IP_ADDRESS = "localhost";
+    final int PORT = 8990;
 
-    public void sendMsg() {
+    public void sendMsgApp() {
         try {
             out.writeUTF(textField.getText());
             textField.clear();
@@ -42,7 +42,7 @@ public class Controller implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         try {
-            socket = new Socket(IP_ADRESS, PORT);
+            socket = new Socket(IP_ADDRESS, PORT);
             in = new DataInputStream(socket.getInputStream());
             out = new DataOutputStream(socket.getOutputStream());
 
