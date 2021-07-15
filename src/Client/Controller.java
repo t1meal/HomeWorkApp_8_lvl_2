@@ -52,6 +52,10 @@ public class Controller implements Initializable {
                     try {
                         while (true) {
                             String str = in.readUTF();
+                            if(str.equals("/clientClosed")){
+//                                out.writeUTF("/end");
+                                break;
+                            }
                             textArea.appendText(str + "\n");
                         }
                     } catch (IOException e){

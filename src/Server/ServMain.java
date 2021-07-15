@@ -21,9 +21,8 @@ public class ServMain {
                 socket = serv.accept();
                 System.out.println("Client has connect!");
 
-                clients.add(new ClientHandler(this, socket));
+                subscribe(new ClientHandler(this, socket));
             }
-
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -41,6 +40,15 @@ public class ServMain {
 
         }
     }
+
+    public void subscribe (ClientHandler client){
+        clients.add(client);
+    }
+
+    public void unsubscribe (ClientHandler client){
+        clients.remove(client);
+    }
+
     public void broadcastMsg(String msg){
         for (ClientHandler o : clients) {
             o.sendMsg(msg);

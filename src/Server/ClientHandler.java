@@ -26,6 +26,7 @@ public class ClientHandler {
                         while (true) {
                             String str = in.readUTF();
                             if (str.equals("/end")) {
+                                out.writeUTF("/clientClosed");
                                 break;
                             }
                             serv.broadcastMsg(str);
@@ -49,6 +50,7 @@ public class ClientHandler {
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
+                        serv.unsubscribe(ClientHandler.this);
                     }
                 }
             }).start();
