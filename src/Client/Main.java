@@ -1,5 +1,6 @@
 package Client;
 
+import Server.ClientHandler;
 import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
@@ -20,6 +21,7 @@ public class Main extends Application {
             @Override
             public void handle(WindowEvent event) {
                 System.out.println("Stage is closing");
+
                 stage.close();
                 System.exit(1);
 

@@ -14,10 +14,13 @@ public class ServMain {
         clients = new Vector<>();
 
         try  {
+            AuthService.connectDB();
             serv = new ServerSocket(8990);
             System.out.println("Server is running!");
 
             while (true){
+//                String login = AuthService.getNickFromLogAndPass("login1", "pass1");
+//                System.out.println(login);
                 socket = serv.accept();
                 System.out.println("Client has connect!");
 
@@ -37,6 +40,7 @@ public class ServMain {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            AuthService.disconnectDB();
 
         }
     }

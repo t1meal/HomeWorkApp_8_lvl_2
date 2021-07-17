@@ -67,4 +67,11 @@ public class ClientHandler {
             e.printStackTrace();
         }
     }
+    public void disconnect(){
+        try {
+            out.writeUTF("/end");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }
