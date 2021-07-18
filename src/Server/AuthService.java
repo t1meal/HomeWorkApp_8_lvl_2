@@ -1,7 +1,6 @@
 package Server;
 
 import java.sql.*;
-import java.util.Collection;
 
 public class AuthService {
     private static Connection connection;
@@ -18,6 +17,14 @@ public class AuthService {
         }
     }
 
+    public static void disconnectDB (){
+        try {
+            connection.close();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+    }
+
     public static String getNickFromLogAndPass (String login, String pass){
         String sql = String.format("SELECT nickname FROM users WHERE login = '%s' AND pass = '%s'", login, pass);
         try {
@@ -30,13 +37,5 @@ public class AuthService {
         }
         return null;
     }
-
-
-    public static void disconnectDB (){
-        try {
-            connection.close();
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
-    }
 }
+

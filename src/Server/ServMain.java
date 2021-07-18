@@ -19,12 +19,10 @@ public class ServMain {
             System.out.println("Server is running!");
 
             while (true){
-//                String login = AuthService.getNickFromLogAndPass("login1", "pass1");
-//                System.out.println(login);
                 socket = serv.accept();
                 System.out.println("Client has connect!");
 
-                subscribe(new ClientHandler(this, socket));
+                new ClientHandler(this, socket);
             }
 
         } catch (IOException e) {
@@ -57,6 +55,10 @@ public class ServMain {
         for (ClientHandler o : clients) {
             o.sendMsg(msg);
         }
+    }
+
+    public Vector<ClientHandler> getClients() {
+        return clients;
     }
 
 }

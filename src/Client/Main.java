@@ -21,14 +21,11 @@ public class Main extends Application {
             @Override
             public void handle(WindowEvent event) {
                 System.out.println("Stage is closing");
-
                 stage.close();
                 System.exit(1);
 
             }
         });
-
-
     }
 
     public static void main(String[] args) {

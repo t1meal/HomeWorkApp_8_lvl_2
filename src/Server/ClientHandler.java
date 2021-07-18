@@ -8,6 +8,7 @@ import java.net.Socket;
 public class ClientHandler {
     private ServMain serv;
     private Socket socket;
+    String nick;
     DataInputStream in;
     DataOutputStream out;
 
@@ -23,13 +24,35 @@ public class ClientHandler {
                 @Override
                 public void run() {
                     try {
-                        while (true) {
+                        while (true){                                   // цикл взаимодействия с авторизацией клиента
+                            String str = in.readUTF();
+                            if (str.startsWith("/auth")){
+                                String[] tokens = str.split(" ");
+                                String currentNick = AuthService.getNickFromLogAndPass(tokens[1], tokens[2]);
+                                if (currentNick != null){
+                                    if (!nickIsBusy(currentNick)){
+                                        sendMsg("/authOk");
+                                        nick = currentNick;
+                                        serv.subscribe(ClientHandler.this);
+                                        break;
+                                    } else {
+                                        sendMsg("Login is busy!");
+                                    }
+                                } else {
+                                    sendMsg("Login and/or Pass is incorrect!");
+                                }
+                            }
+                        }
+
+                        while (true) {                                  // цикл общения с другими клиентами
                             String str = in.readUTF();
                             if (str.equals("/end")) {
                                 out.writeUTF("/clientClosed");
+                                System.out.println("Client is disconnect!");
+
                                 break;
                             }
-                            serv.broadcastMsg(str);
+                            serv.broadcastMsg(nick + " : " + str);
                         }
 
                     } catch (IOException e) {
@@ -73,5 +96,17 @@ public class ClientHandler {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public String getNick() {
+        return nick;
+    }
+    public boolean nickIsBusy (String currantNick){
+        for (ClientHandler e: serv.getClients() ) {
+            if (e.getNick().equals(currantNick)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
