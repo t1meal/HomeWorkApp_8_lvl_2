@@ -1,9 +1,8 @@
 package Server;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 
 public class ClientHandler {
     private ServMain serv;
@@ -11,6 +10,8 @@ public class ClientHandler {
     String nick;
     DataInputStream in;
     DataOutputStream out;
+    File history;
+
 
     public ClientHandler(ServMain serv, Socket socket) {
 
@@ -19,6 +20,8 @@ public class ClientHandler {
             this.socket = socket;
             this.in = new DataInputStream(socket.getInputStream());
             this.out = new DataOutputStream(socket.getOutputStream());
+            this.history = new File("history_" + this.nick + ".txt");
+
 
             new Thread(new Runnable() {
                 @Override
@@ -34,7 +37,10 @@ public class ClientHandler {
                                         sendMsg("/authOk");
                                         nick = currentNick;
                                         serv.subscribe(ClientHandler.this);
+
+                                        sendMsg(nick);          // отправка ника клиенту
                                         break;
+
                                     } else {
                                         sendMsg("Login is busy!");
                                     }
@@ -49,7 +55,6 @@ public class ClientHandler {
                             if (str.equals("/end")) {
                                 out.writeUTF("/clientClosed");
                                 System.out.println("Client is disconnect!");
-
                                 break;
                             }
                             serv.broadcastMsg(nick + " : " + str);
@@ -81,15 +86,17 @@ public class ClientHandler {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
+
     public void sendMsg(String msg){
         try {
             out.writeUTF(msg);
         } catch (IOException e) {
             e.printStackTrace();
         }
+
     }
+
     public void disconnect(){
         try {
             out.writeUTF("/end");
@@ -101,6 +108,7 @@ public class ClientHandler {
     public String getNick() {
         return nick;
     }
+
     public boolean nickIsBusy (String currantNick){
         for (ClientHandler e: serv.getClients() ) {
             if (e.getNick().equals(currantNick)) {

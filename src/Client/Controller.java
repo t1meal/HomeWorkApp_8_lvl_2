@@ -9,11 +9,11 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
 public class Controller {
@@ -35,6 +35,7 @@ public class Controller {
     Socket socket;
     DataInputStream in;
     DataOutputStream out;
+    String nick;
 
     final String IP_ADDRESS = "localhost";
     final int PORT = 8990;
@@ -69,19 +70,24 @@ public class Controller {
                             String str = in.readUTF();
                             if (str.startsWith("/authOk")){
                                 stageAuthorized(true);
+
+                                String nick = in.readUTF();         // запрос ника для создания истории
+                                loadHistory(nick);
                                 break;
+
                             } else {
                                 textArea.appendText(str + "\n");
                             }
                         }
 
-                        while (true) {
+                        while (true) {                          // основной цикл общения
                             String str = in.readUTF();
                             if(str.equals("/clientClosed")){
                                 textArea.clear();
                                 break;
                             }
                             textArea.appendText(str + "\n");
+                            saveHistory();
                         }
                     } catch (IOException e){
                         e.printStackTrace();
@@ -99,6 +105,56 @@ public class Controller {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void saveHistory() {
+        try (DataOutputStream fos = new DataOutputStream(new FileOutputStream ("history_" + nick + ".txt"))) {
+            fos.writeUTF(textArea.getText());
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void loadHistory(String nick) {
+        this.nick = nick;
+        int length = 100;
+        List<String> historyList = new ArrayList<>();
+        File history = new File("history_" + nick + ".txt");
+        if (!history.exists()){
+            try {
+                history.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        try (FileInputStream fis = new FileInputStream(history);
+             BufferedReader br = new BufferedReader(new InputStreamReader(fis))) {
+            String line;
+
+            while ((line = br.readLine()) != null){
+                historyList.add(line);
+            }
+
+            if (historyList.size() >= length){
+                for (int i = 0; i < length; i++) {
+                    textArea.appendText(historyList.get(i) + "\n");
+                }
+            } else {
+                for (int i = 0; i < historyList.size(); i++) {
+                    textArea.appendText(historyList.get(i) + "\n");
+                }
+            }
+
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
     public void stageAuthorized(boolean isAuthorized){
