@@ -13,6 +13,7 @@
         <Button text="LogIn" onAction="#tryToAuth"/>
     </HBox>
 
+
     <TextArea fx:id="textArea" editable="false" wrapText="true" VBox.vgrow="ALWAYS" />
     <HBox fx:id="bottomPanel" managed="false" visible="false">
         <TextField fx:id="textField" onAction="#sendMsgApp" promptText="You message...." HBox.hgrow="ALWAYS" />

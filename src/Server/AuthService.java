@@ -15,6 +15,7 @@ public class AuthService {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
     }
 
     public static void disconnectDB (){

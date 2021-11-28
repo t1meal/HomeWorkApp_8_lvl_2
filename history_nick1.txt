@@ -12,3 +12,4 @@ nick1: hello
 nick2: how are you
 nick2: im fine
 /clientIsClosed
+

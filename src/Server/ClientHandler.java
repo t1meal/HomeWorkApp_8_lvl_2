@@ -16,6 +16,7 @@ public class ClientHandler {
 
     List<String> blacklist;
 
+
     public ClientHandler(ServMain serv, Socket socket) {
 
         try {
