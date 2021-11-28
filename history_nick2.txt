@@ -1,0 +1,14 @@
+nick1 : привет
+nick1 : как дела\
+nick2 : нормально
+nick2 : путем
+nick1 : а у тебя?
+nick2 : нормальнл
+nick3 : как дела парони
+nick1 : норм
+nick2 : нормэ
+
+nick1: hello
+nick2: how are you
+nick2: im fine
+/clientIsClosed
