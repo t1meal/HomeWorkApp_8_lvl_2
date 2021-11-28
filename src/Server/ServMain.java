@@ -51,10 +51,22 @@ public class ServMain {
         clients.remove(client);
     }
 
-    public void broadcastMsg(String msg){
+    public void broadcastMsg(ClientHandler from, String msg){
         for (ClientHandler o : clients) {
-            o.sendMsg(msg);
+            if (!o.checkBlackList(from.getNick())){
+                o.sendMsg(msg);
+            }
         }
+    }
+    public void sendPersonalMsg(ClientHandler from, String nickTo, String msg) {
+        for (ClientHandler o : clients) {
+            if (o.getNick().equals(nickTo)) {
+                o.sendMsg("from " + from.getNick() + ": " + msg);
+                from.sendMsg("to " + nickTo + ": " + msg);
+                return;
+            }
+        }
+        from.sendMsg("Клиент с ником " + nickTo + " не найден в чате");
     }
 
     public Vector<ClientHandler> getClients() {

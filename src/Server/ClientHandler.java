@@ -2,7 +2,9 @@ package Server;
 
 import java.io.*;
 import java.net.Socket;
-import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class ClientHandler {
     private ServMain serv;
@@ -12,6 +14,7 @@ public class ClientHandler {
     DataOutputStream out;
     File history;
 
+    List<String> blacklist;
 
     public ClientHandler(ServMain serv, Socket socket) {
 
@@ -20,6 +23,7 @@ public class ClientHandler {
             this.socket = socket;
             this.in = new DataInputStream(socket.getInputStream());
             this.out = new DataOutputStream(socket.getOutputStream());
+            this.blacklist = new ArrayList<>();
             this.history = new File("history_" + this.nick + ".txt");
 
 
@@ -50,16 +54,29 @@ public class ClientHandler {
                             }
                         }
 
-                        while (true) {                                  // цикл общения с другими клиентами
+                        while (true) {
                             String str = in.readUTF();
-                            if (str.equals("/end")) {
-                                out.writeUTF("/clientClosed");
-                                System.out.println("Client is disconnect!");
-                                break;
+                            if (str.startsWith("/")) {
+                                if (str.equals("/end")) {
+                                    out.writeUTF("/clientIsClosed");
+                                    System.out.println("Client is disconnect!");
+                                    break;
+                                }
+                                if (str.startsWith("/w ")) { // /w nick3 lsdfhldf sdkfjhsdf wkerhwr
+                                    String[] tokens = str.split(" ", 3);
+                                    String m = str.substring(tokens[1].length() + 4);
+                                    serv.sendPersonalMsg(ClientHandler.this, tokens[1], tokens[2]);
+                                }
+                                if (str.startsWith("/blacklist ")) { // /blacklist nick3
+                                    String[] tokens = str.split(" ");
+                                    blacklist.add(tokens[1]);
+                                    sendMsg("Вы добавили пользователя " + tokens[1] + " в черный список");
+                                }
+                            } else {
+                                serv.broadcastMsg(ClientHandler.this,nick + ": " + str);
                             }
-                            serv.broadcastMsg(nick + " : " + str);
+                            System.out.println("Client: " + str);
                         }
-
                     } catch (IOException e) {
                         e.printStackTrace();
                     } finally {
@@ -116,5 +133,8 @@ public class ClientHandler {
             }
         }
         return false;
+    }
+    public boolean checkBlackList (String nick){
+        return blacklist.contains(nick);
     }
 }
