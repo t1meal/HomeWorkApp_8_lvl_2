@@ -1,4 +1,4 @@
-nick1 : привет
+]nick1 : привет
 nick1 : как дела\
 nick2 : нормально
 nick2 : путем
@@ -11,5 +11,8 @@ nick2 : нормэ
 nick1: hello
 nick2: how are you
 nick2: im fine
-/clientIsClosed
 
+nick1: привет
+nick2: как дела?
+nick2: нормально
+nick1: hello!

@@ -34,6 +34,12 @@ public class testFile {
             e.printStackTrace();
 
         }
+        String login = "login1";
+        String pass = "pass1";
+
+        String sql = String.format("SELECT nickname FROM users WHERE login = '%s' AND pass = '%s'", login, pass);
+        System.out.println(sql);
+
 
     }
     private void dirWalker(File file){
