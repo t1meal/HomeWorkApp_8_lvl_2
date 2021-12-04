@@ -3,3 +3,8 @@ nick1 : норм
 nick2 : нормэ
 
 
+nick1: хай!!!!
+nick3: павпвапвап
+nick3: vsdfvsdf
+to nick2: ghbdtn
+/clientIsClosed

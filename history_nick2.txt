@@ -1,4 +1,4 @@
-Inick1 : привет
+nick1 : привет
 nick1 : как дела\
 nick2 : нормально
 nick2 : путем
@@ -15,3 +15,12 @@ nick2: im fine
 nick2: как дела?
 nick2: нормально
 nick1: hello!
+nick1: хай!!!!
+nick3: павпвапвап
+Вы добавили пользователя nick3 в черный список
+from nick3: ghbdtn
+nick1: привет
+nick2: привет
+nick1: привет
+nick1: как дела
+/clientIsClosed
