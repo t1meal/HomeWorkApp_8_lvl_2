@@ -78,6 +78,7 @@ public class Controller {
                             } else {
                                 textArea.appendText(str + "\n");
                             }
+
                         }
 
                         while (true) {                          // основной цикл общения

@@ -15,6 +15,7 @@ public class AuthService {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
     }
 
     public static void disconnectDB (){
@@ -25,17 +26,20 @@ public class AuthService {
         }
     }
 
-    public static String getNickFromLogAndPass (String login, String pass){
-        String sql = String.format("SELECT nickname FROM users WHERE login = '%s' AND pass = '%s'", login, pass);
-        try {
-            ResultSet rs = statement.executeQuery(sql);
+    public static String getNickFromLogAndPass  (String login, String pass){
+        try (PreparedStatement ps = connection.prepareStatement("SELECT nickname FROM users WHERE login = ? AND pass = ?")) {
+            ps.setString(1,login);
+            ps.setString(2, pass);
+
+            ResultSet rs = ps.executeQuery();
             if (rs.next()){
                 return rs.getString(1);
             }
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
         return null;
+
     }
 }
 

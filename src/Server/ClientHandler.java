@@ -4,6 +4,9 @@ import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 
 public class ClientHandler {
@@ -13,8 +16,9 @@ public class ClientHandler {
     DataInputStream in;
     DataOutputStream out;
     File history;
-
     List<String> blacklist;
+    ExecutorService executorService = Executors.newFixedThreadPool(10);
+
 
     public ClientHandler(ServMain serv, Socket socket) {
 
@@ -27,78 +31,83 @@ public class ClientHandler {
             this.history = new File("history_" + this.nick + ".txt");
 
 
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        while (true){                                   // цикл взаимодействия с авторизацией клиента
-                            String str = in.readUTF();
-                            if (str.startsWith("/auth")){
-                                String[] tokens = str.split(" ");
-                                String currentNick = AuthService.getNickFromLogAndPass(tokens[1], tokens[2]);
-                                if (currentNick != null){
-                                    if (!nickIsBusy(currentNick)){
-                                        sendMsg("/authOk");
-                                        nick = currentNick;
-                                        serv.subscribe(ClientHandler.this);
+            executorService.execute(() -> {
+                try {
+                    while (true){                                   // цикл взаимодействия с авторизацией клиента
+                        String str = in.readUTF();
+                        if (str.startsWith("/auth")){
+                            String[] tokens = str.split(" ");
+                            String currentNick = AuthService.getNickFromLogAndPass(tokens[1], tokens[2]);
+                            if (currentNick != null){
+                                if (!nickIsBusy(currentNick)){
+                                    sendMsg("/authOk");
+                                    nick = currentNick;
+                                    serv.subscribe(ClientHandler.this);
 
-                                        sendMsg(nick);          // отправка ника клиенту
-                                        break;
-
-                                    } else {
-                                        sendMsg("Login is busy!");
-                                    }
-                                } else {
-                                    sendMsg("Login and/or Pass is incorrect!");
-                                }
-                            }
-                        }
-
-                        while (true) {
-                            String str = in.readUTF();
-                            if (str.startsWith("/")) {
-                                if (str.equals("/end")) {
-                                    out.writeUTF("/clientIsClosed");
-                                    System.out.println("Client is disconnect!");
+                                    sendMsg(nick);          // отправка ника клиенту
                                     break;
-                                }
-                                if (str.startsWith("/w ")) { // /w nick3 lsdfhldf sdkfjhsdf wkerhwr
-                                    String[] tokens = str.split(" ", 3);
-                                    String m = str.substring(tokens[1].length() + 4);
-                                    serv.sendPersonalMsg(ClientHandler.this, tokens[1], tokens[2]);
-                                }
-                                if (str.startsWith("/blacklist ")) { // /blacklist nick3
-                                    String[] tokens = str.split(" ");
-                                    blacklist.add(tokens[1]);
-                                    sendMsg("Вы добавили пользователя " + tokens[1] + " в черный список");
+
+                                } else {
+                                    sendMsg("Login is busy!");
                                 }
                             } else {
-                                serv.broadcastMsg(ClientHandler.this,nick + ": " + str);
+                                sendMsg("Login and/or Pass is incorrect!");
                             }
-                            System.out.println("Client: " + str);
                         }
+                    }
+
+                    while (true) {
+                        String str = in.readUTF();
+                        if (str.startsWith("/")) {
+                            if (str.equals("/end")) {
+                                out.writeUTF("/clientIsClosed");
+                                System.out.println("Client is disconnect!");
+                                break;
+                            }
+                            if (str.startsWith("/w ")) { // /w nick3 lsdfhldf sdkfjhsdf wkerhwr
+                                String[] tokens = str.split(" ", 3);
+                                String m = str.substring(tokens[1].length() + 4);
+                                serv.sendPersonalMsg(ClientHandler.this, tokens[1], tokens[2]);
+                            }
+                            if (str.startsWith("/blacklist ")) { // /blacklist nick3
+                                String[] tokens = str.split(" ");
+                                blacklist.add(tokens[1]);
+                                sendMsg("Вы добавили пользователя " + tokens[1] + " в черный список");
+                            }
+                        } else {
+                            serv.broadcastMsg(ClientHandler.this,nick + ": " + str);
+                        }
+                        System.out.println("Client: " + str);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } finally {
+                    try {
+                        in.close();
                     } catch (IOException e) {
                         e.printStackTrace();
-                    } finally {
-                        try {
-                            in.close();
-                        } catch (IOException e) {
-                            e.printStackTrace();
+                    }
+                    try {
+                        out.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    try {
+                        socket.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    serv.unsubscribe(ClientHandler.this);
+                    executorService.shutdown();
+                    try {
+                        if (!executorService.awaitTermination(500, TimeUnit.MILLISECONDS)){
+                            executorService.shutdownNow();
                         }
-                        try {
-                            out.close();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                        try {
-                            socket.close();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                        serv.unsubscribe(ClientHandler.this);
+                    } catch (InterruptedException e) {
+                        executorService.shutdownNow();
                     }
                 }
-            }).start();
+            });
 
         } catch (IOException e) {
             e.printStackTrace();

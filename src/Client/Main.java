@@ -24,6 +24,7 @@ public class Main extends Application {
                 stage.close();
                 System.exit(1);
 
+
             }
         });
     }
